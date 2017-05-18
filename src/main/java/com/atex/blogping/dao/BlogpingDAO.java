@@ -18,4 +18,9 @@ public interface BlogpingDAO {
      */
     List<WeblogDTO> getWeblogs();
 
+    /**
+     * Delete a {@link WeblogDTO} from the data store.
+     * @param weblogDTO The weblog to delete.
+     */
+    void deleteWeblog(WeblogDTO weblogDTO);
 }

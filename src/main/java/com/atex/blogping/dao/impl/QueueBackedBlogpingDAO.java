@@ -33,4 +33,15 @@ public class QueueBackedBlogpingDAO implements BlogpingDAO {
         Collections.reverse(weblogList);
         return weblogList;
     }
+
+    @Override
+    public void deleteWeblog(final WeblogDTO weblogDTO) {
+        if (weblogDTO == null) {
+            throw new IllegalArgumentException("weblog is null");
+        }
+
+        weblogs.removeIf(item ->
+                item.getName().equals(weblogDTO.getName()) &&
+                        item.getUrl().equals(weblogDTO.getUrl()));
+    }
 }

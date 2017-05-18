@@ -61,6 +61,19 @@ public class BlogpingServiceTest {
     }
 
     @Test
+    public void delete_should_return_ok() {
+        //given
+        Request valid = givenValidRequest();
+
+        // when
+        Response response = service.deleteSite(valid.name, valid.url);
+
+        // then
+        assertEquals(Responses.OK, response);
+        verify(blogpingDAO).deleteWeblog(Matchers.<WeblogDTO>any());
+    }
+
+    @Test
     public void shouldAcceptRequestAndReturnOkForHttpsUrl() {
         Request valid = givenValidRequestWithHttpsUrl();
 

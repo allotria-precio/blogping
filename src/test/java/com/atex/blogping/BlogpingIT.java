@@ -5,6 +5,7 @@ import com.atex.blogping.jaxb.Changes;
 import com.atex.blogping.jaxb.Responses;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -42,6 +43,29 @@ public class BlogpingIT {
         String changesResponse = getChanges();
         assertTrue(changesResponse.contains(name));
         assertTrue(changesResponse.contains(url));
+    }
+
+    @Test
+    public void delete_and_verify_response() throws IOException {
+        // given
+        String name = "AtexBlog";
+        String url = "http://www.atex.com";
+        GetMethod ping = givenGetMethod(name, url);
+        String getResponse = whenExecuteGet(ping);
+        assertTrue(getResponse.contains(Responses.OK.getMessage()));
+
+        DeleteMethod deleteMethod = givenDeleteMethod(name, url);
+
+        // when
+        String deleteResponse = whenExecuteDelete(deleteMethod);
+
+        // then
+        assertTrue(deleteResponse.contains(Responses.OK.getMessage()));
+        String changesResponse = getChanges();
+        assertFalse(changesResponse.contains(name));
+        assertFalse(changesResponse.contains(url));
+
+
     }
 
 
@@ -152,6 +176,15 @@ public class BlogpingIT {
         return new GetMethod(sb.toString());
     }
 
+    private DeleteMethod givenDeleteMethod(String name, String url) throws URIException {
+        final StringBuilder sb = new StringBuilder("http://localhost:8080/pingSiteForm");
+
+        addParam(sb, "name", name);
+        addParam(sb, "url", url);
+
+        return new DeleteMethod(sb.toString());
+    }
+
     private void addParam(final StringBuilder sb, String parameterName, String parameterValue) throws URIException {
         if (parameterValue != null) {
             addParameterDelimiter(sb);
@@ -197,6 +230,15 @@ public class BlogpingIT {
             return ping.getResponseBodyAsString();
         } finally {
             ping.releaseConnection();
+        }
+    }
+
+    private String whenExecuteDelete(DeleteMethod deleteMethod) throws IOException {
+        try {
+            client.executeMethod(deleteMethod);
+            return deleteMethod.getResponseBodyAsString();
+        } finally {
+            deleteMethod.releaseConnection();
         }
     }
 
